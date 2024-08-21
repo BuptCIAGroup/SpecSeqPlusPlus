@@ -83,6 +83,7 @@ We have provided some example datasets that you can use to test the program. Her
 ```
 ./specseq++ datasets/random_complex/vr_complex(random_100000,0.016).txt ./output/vr_complex(random_100000,0.016).txt ascii ascii 1 102400 1.05 65536 100 250
 ```
+Due to the large size of the data, it is difficult to upload. All the data can be found at the following link.
 https://pan.baidu.com/s/1-8nr7NDst8PolwmWwXa-Kg?pwd=kcp0 
 
 ## Author
