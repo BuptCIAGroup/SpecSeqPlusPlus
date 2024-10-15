@@ -6,6 +6,7 @@ SpecSeq++ is a C++ project designed to compute persistent homology (PH). It util
 
 - CUDA
 - GUDHI (with dependencies on CGAL, Miniball, PyKeOps)
+- PHAT (phat-highclear Project)
 
 ## Compilation
 
@@ -45,7 +46,7 @@ To run the program, use the following command:
 ### Example
 
 ```sh
-./specseq++ input.txt output.txt ascii ascii 0 102400 1.05 65536 100 4000
+./specseq++ input.txt output.txt ascii ascii 0 1 10 1024000 1.05 65536 1000 2000
 ```
 
 ### Help
@@ -63,25 +64,25 @@ We have provided some example datasets that you can use to test the program. Her
 ### VR complex: 
 
 ```sh
-./specseq++ data/vr_complex/o3_4096_125.txt ./output/o3_4096_125.txt ascii ascii 1 102400 1.05 65536 1000 8000 
+./specseq++ data/vr_complex/o3_4096_125.txt ./output/o3_4096_125.txt ascii ascii 0 1 10 102400 1.05 65536 1000 8000 
 ```
 
 ### Alpha complex: 
 
 ```sh
-./specseq++ data/alpha_complex/alpha_complex(bunny_35947,0.05).txt ./output/alpha_complex(bunny_35947,0.05).txt ascii ascii 0 102400 1.05 65536 1000 16000
+./specseq++ data/alpha_complex/alpha_complex(bunny_35947,0.05).txt ./output/alpha_complex(bunny_35947,0.05).txt ascii ascii 0 0 0 102400 1.05 65536 1000 16000
 ```
 
 ### Random Alpha complex: 
 
 ```sh
-./specseq++ datasets/random_complex/alpha_complex(random_100000,90.0).txt ./output/alpha_complex(random_100000,90.0).txt ascii ascii 0 102400 1.05 20000 1000 16000
+./specseq++ datasets/random_complex/alpha_complex(random_100000,90.0).txt ./output/alpha_complex(random_100000,90.0).txt ascii ascii 0 0 0 102400 1.05 20000 1000 16000
 ```
 
 ### Random VR complex: 
 
 ```
-./specseq++ datasets/random_complex/vr_complex(random_100000,0.016).txt ./output/vr_complex(random_100000,0.016).txt ascii ascii 1 102400 1.05 65536 100 250
+./specseq++ datasets/random_complex/vr_complex(random_100000,0.016).txt ./output/vr_complex(random_100000,0.016).txt ascii ascii 0 1 100 102400 1.05 65536 100 250
 ```
 Due to the large size of the data, it is difficult to upload. All the data can be found at the following link.
 
@@ -93,6 +94,7 @@ Bupt CIAGroup
 
 ## Acknowledgements
 
+- The PHAT project for providing essential libraries and tools.
 - The GUDHI project for providing essential libraries and tools.
 - The CUDA development team for GPU acceleration support.
 
@@ -101,8 +103,13 @@ Bupt CIAGroup
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+
 ## Third-Party Code
 
-This project includes code from the GUDHI project, specifically the `Flag_complex_edge_collapser.h` file. The GUDHI project is licensed under the MIT License. However, some GUDHI modules depend on third-party libraries that are under a GPLv3 or a LGPL license (CGAL, Miniball, PyKeOps). For practical purposes, if you use these modules, your project must comply with the GPLv3 license.
+This project includes code from the GUDHI project, specifically the `Flag_complex_edge_collapser.h` file. The GUDHI project is licensed under the MIT License. However, some GUDHI modules depend on third-party libraries that are under a GPLv3 or LGPL license (CGAL, Miniball, PyKeOps). For practical purposes, if you use these modules, your project must comply with the GPLv3 license.
 
-See the [GUDHI_LICENSE](GUDHI_LICENSE) file for details.
+Additionally, this project incorporates the PHAT library, specifically utilized in the `phat-highclear[cpu]` component. PHAT is licensed under both LGPL-3.0 and GPL-3.0. It is important to note that if your project uses PHAT, it must comply with these licenses, particularly if you distribute any derivative works.
+
+For more detailed licensing information:
+- See the [GUDHI_LICENSE](GUDHI_LICENSE) file for details regarding GUDHI's license.
+- Refer to the licensing documentation provided with PHAT for specifics on LGPL-3.0 and GPL-3.0 compliance.

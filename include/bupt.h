@@ -1,3 +1,26 @@
+/*
+MIT License
+
+Copyright (c) 2024 Bupt CIAGroup
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 #pragma once
 #include <bits/stdc++.h>
 #include <cuda_runtime.h> 
@@ -9,6 +32,9 @@
 #include <thrust/sort.h>
 #include <thrust/device_vector.h>
 #include <thrust/reduce.h>
+#include <thrust/functional.h>
+#include <thrust/device_ptr.h>
+#include <thrust/count.h>
 #include <thrust/functional.h>
 
 
@@ -24,13 +50,13 @@ const int32_t MAXDIM = 5;
 #ifdef MULTIKEY
 const int32_t MAXKEY = 2;
 #else
-const int32_t MAXKEY = 1;
+const int32_t MAXKEY = 2;
 #endif
 const int32_t BLOCK_SIZE_BIT = 8;
 const int32_t BLOCK_SIZE = 1 << BLOCK_SIZE_BIT;
 const int32_t WARP_SIZE_BIT = 5;
 const int32_t WARP_SIZE = 1 << WARP_SIZE_BIT;
-const int32_t WARP_EXTRA_SIZE_BIT = 15;
+const int32_t WARP_EXTRA_SIZE_BIT = 14;
 const int32_t WARP_EXTRA_SIZE = 1 << WARP_EXTRA_SIZE_BIT;
 const int32_t BLOCK_EXTRA_SIZE_BIT = BLOCK_SIZE_BIT - WARP_SIZE_BIT + WARP_EXTRA_SIZE_BIT;
 const int32_t BLOCK_EXTRA_SIZE = 1 << BLOCK_EXTRA_SIZE_BIT;

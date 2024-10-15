@@ -22,11 +22,15 @@ all: specseq
 # ---------- GCC ----------- #
 # -------------------------- #
 # RTX4090 sm_89
+# A800 sm_80
 specseq:
 	${CC} ${DIR_src}/main.cu ${SRC} -DMULTIKEY -gencode arch=compute_80,code=compute_80 -Xcompiler -fopenmp -I /usr/local/cuda/include/ -L/usr/local/cuda/bin/ -I ./include -o ${DIR_bin}/specseq++ ${FLAGS} ${CUDA_FLAGS}
 
 multikey:
 	${CC} ${DIR_src}/main.cu ${SRC} -DMULTIKEY -gencode arch=compute_89,code=compute_89 -Xcompiler -fopenmp -I /usr/local/cuda/include/ -L/usr/local/cuda/bin/ -I ./include -o ${DIR_bin}/specseq++ ${FLAGS} ${CUDA_FLAGS}
+
+highout:
+	${CC} ${DIR_src}/main.cu ${SRC} -DMULTIKEY -DHIGHOUT -gencode arch=compute_80,code=compute_80 -Xcompiler -fopenmp -I /usr/local/cuda/include/ -L/usr/local/cuda/bin/ -I ./include -o ${DIR_bin}/specseq++ ${FLAGS} ${CUDA_FLAGS}
 
 clean:
 	cd ${DIR_bin} && rm ${OBJS} && cd ..

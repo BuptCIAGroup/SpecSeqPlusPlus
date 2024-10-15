@@ -1,3 +1,26 @@
+/*
+MIT License
+
+Copyright (c) 2024 Bupt CIAGroup
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -65,7 +88,7 @@ void printGpuInfo() {
 }
 
 bool processFiles(const std::string& inputFile, IOFormat inputFormat,
-    std::vector<std::vector<int64_t>>& hv_csc, std::vector<std::vector<int64_t>>& hv_neighbor, std::vector<int32_t>& hv_dim) {
+    std::vector<std::vector<int32_t>>& hv_csc, std::vector<std::vector<int32_t>>& hv_neighbor, std::vector<int32_t>& hv_dim) {
     printGpuInfo();
     if (inputFormat == IOFormat::Ascii) {
         std::ifstream input_stream(inputFile.c_str());
@@ -74,36 +97,30 @@ bool processFiles(const std::string& inputFile, IOFormat inputFormat,
             return false;
         }
         std::string cur_line;
-        int64_t cur_col = -1;
-        std::vector<int64_t> temp_col;
-        hv_csc.clear();
-        hv_neighbor.clear();
-        hv_dim.clear();
+        int32_t cur_col = -1;
+        std::vector<int32_t> temp_col;
+        hv_csc.clear();hv_csc.push_back(std::vector<int32_t>());
+        hv_dim.clear();hv_dim.push_back(0);
         while (getline(input_stream, cur_line)) {
             cur_line.erase(cur_line.find_last_not_of(" \t\n\r\f\v") + 1);
             if (!cur_line.empty() && cur_line[0] != '#') {
                 cur_col++;
                 std::stringstream ss(cur_line);
-                int64_t temp_dim;
+                int32_t temp_dim;
                 ss >> temp_dim;
                 int32_t cdim = temp_dim;
-                int64_t temp_int64_t;
+                int32_t temp_int64_t;
                 temp_col.clear();
                 while (ss >> temp_int64_t) {
-                    temp_col.push_back(static_cast<int64_t>(temp_int64_t));
+                    temp_col.push_back(static_cast<int32_t>(temp_int64_t + 1));
+                    
                 }
                 std::sort(temp_col.begin(), temp_col.end());
                 temp_col.erase(std::unique(temp_col.begin(), temp_col.end()), temp_col.end());
                 hv_csc.push_back(temp_col);
                 hv_dim.push_back(cdim);
-                if (cdim == 0) {
-                    hv_neighbor.push_back(std::vector<int64_t>());
-                }
-                else if (cdim == 1) {
-                    hv_neighbor[temp_col[0]].push_back(temp_col[1]);
-                    hv_neighbor[temp_col[1]].push_back(temp_col[0]);
-                }
             }
+            
         }
         input_stream.close();
     }
@@ -113,9 +130,8 @@ bool processFiles(const std::string& inputFile, IOFormat inputFormat,
             std::cerr << "Error: Failed to read from input stream." << std::endl;
             return false;
         }
-        hv_csc.clear();
-        hv_neighbor.clear();
-        hv_dim.clear();
+        hv_csc.clear();hv_csc.push_back(std::vector<int32_t>());
+        hv_dim.clear();hv_dim.push_back(0);
         int64_t num_cols;
         input_stream.read(reinterpret_cast<char*>(&num_cols), sizeof(num_cols));
 
@@ -132,15 +148,15 @@ bool processFiles(const std::string& inputFile, IOFormat inputFormat,
 
             std::sort(temp_col.begin(), temp_col.end());
             temp_col.erase(std::unique(temp_col.begin(), temp_col.end()), temp_col.end());
-            hv_csc.push_back(temp_col);
+
+            std::vector<int32_t> temp_col_int32_t;
+            temp_col_int32_t.reserve(temp_col.size());
+            for (const auto& value : temp_col) {
+                temp_col_int32_t.push_back(static_cast<int32_t>(value));
+            }
+
+            hv_csc.push_back(temp_col_int32_t);
             hv_dim.push_back(cdim);
-            if (cdim == 0) {
-                hv_neighbor.push_back(std::vector<int64_t>());
-            }
-            else if (cdim == 1) {
-                hv_neighbor[temp_col[0]].push_back(temp_col[1]);
-                hv_neighbor[temp_col[1]].push_back(temp_col[0]);
-            }
         }
         input_stream.close();
     }
@@ -154,18 +170,21 @@ void printHelp() {
     std::cout << "Usage: program <input_file> <output_file> <input_format> <output_format> <model> <ss_block_size> <block_size_growth_rate> <level1_capacity> <level2_capacity> [<level3_capacity>]\n";
     std::cout << "input_format: ascii or binary\n";
     std::cout << "output_format: ascii or binary\n";
+    std::cout << "dualize: \n";
+    std::cout << "  0 - No dualize\n";
+    std::cout << "  1 - Enable dualize\n";
     std::cout << "model: \n";
     std::cout << "  0 - No optimizations\n";
     std::cout << "  1 - Enable high-dimensional clearing theorem\n";
     std::cout << "  2 - Enable edge collapsing\n";
-    std::cout << "  3 - Enable both high-dimensional clearing theorem and edge collapsing\n";
+    std::cout << "  3 - Enable both high-dimension guided clearing theorem and edge collapsing\n";
+    std::cout << "max_iteration[Only effective when model equals 1 or 3.]: The strength of the high-dimension guided clearance theorem increases with larger parameters, leading to higher returns, but the costs also rise accordingly.\n";
     std::cout << "ss_block_size: Block size for ss (default 102400)\n";
     std::cout << "block_size_growth_rate: Block size growth rate (default 1.05)\n";
     std::cout << "queue_size: maximum size addition (default 65536)\n";
     std::cout << "level1_capacity: Capacity for level 1 array\n";
     std::cout << "level2_capacity: Capacity for level 2 array\n";
-    std::cout << "level3_capacity: Capacity for level 3 array (can be omitted)\n";
-    std::cout << "Example: ./specseq++ input.txt output.txt ascii ascii 0 102400 1.05 65536 100 4000 10000\n";
+    std::cout << "Example: ./specseq++ input.txt output.txt ascii ascii 0 1 10 1024000 1.05 65536 1000 2000\n";
 }
 
 
@@ -253,7 +272,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    if (argc < 11) {
+    if (argc < 13) {
         std::cerr << "Invalid number of arguments.\n";
         printHelp();
         return 1;
@@ -263,15 +282,18 @@ int main(int argc, char* argv[]) {
     std::string outputFile = argv[2];
     std::string inputFormatStr = argv[3];
     std::string outputFormatStr = argv[4];
-    int32_t model = std::stoi(argv[5]);
-    int32_t ssBlockSize = std::stoi(argv[6]);
-    float blockSizeGrowthRate = std::stof(argv[7]);
+    int32_t dualize = std::stoi(argv[5]);
+    int32_t model = std::stoi(argv[6]);
+    int32_t highclear_maxneighbors = std::stoi(argv[7]);
+    int32_t ssBlockSize = std::stoi(argv[8]);
+    float blockSizeGrowthRate = std::stof(argv[9]);
 
-    int32_t queuSize = std::stoi(argv[8]);
+    int32_t queuSize = std::stoi(argv[10]);
     int32_t level_capacity[4] = { 0 };
-    level_capacity[1] = std::stoi(argv[9]);
-    level_capacity[2] = std::stoi(argv[10]);
-    if (argc >= 12) level_capacity[3] = std::stoi(argv[11]);
+    level_capacity[1] = std::stoi(argv[11]);
+    level_capacity[2] = std::stoi(argv[12]);
+    // if (argc >= 13) level_capacity[3] = std::stoi(argv[12]);
+    // level_capacity[3] = INT_MAX;
     IOFormat inputFormat, outputFormat;
 
     if (inputFormatStr == "ascii") {
@@ -299,15 +321,18 @@ int main(int argc, char* argv[]) {
     }
 
     std::cout << "------------------------------------------------------BUPT------------------------------------------------------\n";
-    std::vector<std::vector<int64_t>> hv_csc;
-    std::vector<std::vector<int64_t>> hv_neighbor;
+    std::vector<std::vector<int32_t>> hv_csc;
+    std::vector<std::vector<int32_t>> hv_neighbor;
     std::vector<int32_t> hv_dim;
+
+    
     processFiles(inputFile, inputFormat, hv_csc, hv_neighbor, hv_dim);
     // if (dualize) {
     //     dualizeMatrix(hv_csc, hv_dim);
     //     // printMatrix(hv_csc);
     // }
-    SpecSeqPlusPlus alg(hv_csc, hv_dim, hv_neighbor, level_capacity, model, ssBlockSize, blockSizeGrowthRate, queuSize);
+
+    SpecSeqPlusPlus alg(hv_csc, hv_dim, hv_neighbor, level_capacity, dualize, model, highclear_maxneighbors, ssBlockSize, blockSizeGrowthRate, queuSize);
     alg.setDataFileName(extractFileNameWithoutExtension(inputFile));
     float InitTime = alg.GPU_Init();
 
