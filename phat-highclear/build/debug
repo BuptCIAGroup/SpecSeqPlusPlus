@@ -1,0 +1,8 @@
+Reading input file ../../../CPalgo-lqm-mergepath/o3_4096_100.txt in ascii mode
+Reading input file took 4.5s
+Computing persistence pairs ...
+-----------------------------------------------maxdimhighclear  begin-----------------------------------------------
+-----------------------------------------------maxdimhighclear  end-----------------------------------------------
+Computing persistence pairs took 8.9s
+Writing output file ../../output/output.txt in ascii mode ...
+Writing output file took 4.5s
